@@ -167,7 +167,12 @@ struct _FTSSequence: Sequence {
             }
 
             state = [Optional(UnsafeMutablePointer(mutating: path)), nil].withUnsafeBufferPointer { dirList in
-                guard let stream = fts_open(unsafeBitCast(dirList.baseAddress!, to: UnsafePointer<UnsafeMutablePointer<CChar>>.self), opts, nil) else {
+#if canImport(Android)
+                let baseAddress = unsafeBitCast(dirList.baseAddress!, to: UnsafePointer<UnsafeMutablePointer<CChar>>.self)
+#else
+                let baseAddress = dirList.baseAddress!
+#endif
+                guard let stream = fts_open(baseAddress, opts, nil) else {
                     return .error(errno, String(cString: path))
                 }
                 return .stream(stream)
