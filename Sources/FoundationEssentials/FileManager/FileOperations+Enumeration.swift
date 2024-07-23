@@ -166,8 +166,8 @@ struct _FTSSequence: Sequence {
                 return
             }
 
-            state = [UnsafeMutablePointer(mutating: path), nil].withUnsafeBufferPointer { dirList in
-                guard let stream = fts_open(dirList.baseAddress!, opts, nil) else {
+            state = [Optional(UnsafeMutablePointer(mutating: path)), nil].withUnsafeBufferPointer { dirList in
+                guard let stream = fts_open(unsafeBitCast(dirList.baseAddress!, to: UnsafePointer<UnsafeMutablePointer<CChar>>.self), opts, nil) else {
                     return .error(errno, String(cString: path))
                 }
                 return .stream(stream)
