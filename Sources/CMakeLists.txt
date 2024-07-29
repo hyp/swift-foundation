@@ -14,7 +14,11 @@
 
 include(ExternalProject)
 if(CMAKE_HOST_WIN32)
-  set(_FoundationMacrosSwiftFlags -DCMAKE_Swift_FLAGS="-use-ld=lld")
+  set(_flags "-use-ld=lld")
+  if(DEFINED CMAKE_HOST_Swift_FLAGS)
+    set(_flags "${_flags} ${CMAKE_HOST_Swift_FLAGS}")
+  endif()
+  set(_FoundationMacrosSwiftFlags "-DCMAKE_Swift_FLAGS=${_flags}")
 endif()
 ExternalProject_Add(FoundationMacros
   SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/FoundationMacros"
