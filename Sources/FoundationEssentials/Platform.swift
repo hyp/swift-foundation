@@ -180,9 +180,14 @@ extension Platform {
     
     static func fullName(forUID uid: uid_t) -> String? {
         withUserGroupBuffer(uid, passwd(), sizeProperty: Int32(_SC_GETPW_R_SIZE_MAX), operation: getpwuid_r) {
+#if os(Android) && (arch(i386) || arch(arm))
+            // pw_gecos isn't available on 32-bit Android.
+            let pw_gecos: UnsafeMutablePointer<CChar>? = nil
+#else
             // Android's pw_gecos `char *`` is nullable, so always coerce to a nullable pointer
             // in order to be compatible with Android.
             let pw_gecos: UnsafeMutablePointer<CChar>? = $0.pw_gecos
+#endif
             return pw_gecos.flatMap { String(cString: $0) }
         }
     }
